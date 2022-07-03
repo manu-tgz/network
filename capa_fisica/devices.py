@@ -1,8 +1,9 @@
-from shutil import ExecError
+from capa_fisica.physical import Log
 
-class ControladorRed:
-    pass
-
+class Device:
+    def __init__(self,name): 
+        self.log = Log()
+        self.name = name 
 
 class Cable:
     def __init__(self,puerto1,puerto2):
@@ -40,9 +41,9 @@ class Puerto:
         return self.cable == None
 
 
-class PC:
-    def __init__(self,nombre):
-        self.nombre = nombre 
+class PC(Device):
+    def __init__(self,name):
+        super().__init__(name)
         self.puertos = [] 
         self.transmision_actual = None
         self.transmision_recibida = None
@@ -52,7 +53,7 @@ class PC:
         if len(self.puertos) == 1:
             Exception("La PC tiene un solo puerto")        
             return
-        self.puerto.append(puerto)
+        self.puertos.append(puerto)
         puerto.dispositivo = self
 
     def conectar(self, dispositivo):
@@ -74,11 +75,10 @@ class PC:
     def desconectar(self):
         self.puertos.cable.desconectar()
 
-
-class Hub:
-    def __init__(self,nombre,cantidad_puertos):
-        self.cantidad_puertos = cantidad_puertos 
-        self.nombre = nombre 
+class Hub(Device):
+    def __init__(self,name,cantidad_puertos):
+        super().__init__(name)
+        self.cantidad_puertos = int(cantidad_puertos) 
         self.puertos = [] 
         self.transmision_actual = None
         self.transmision_recibida = None
