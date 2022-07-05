@@ -1,0 +1,9 @@
+25 create host c1
+25 create host c2
+25 create hub h1 4
+
+30 connect c1_1 h1_2
+30 connect c2_1 h1_3
+
+40 send c1 101
+51 send c2 1

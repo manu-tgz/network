@@ -1,2 +1,2 @@
-from capa_fisica.main import main
+from app.main1 import main
 main()

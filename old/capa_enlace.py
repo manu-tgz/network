@@ -4,13 +4,12 @@ from herramientas import buscar_mac
 class ControladorRed:
     pass
 
-
-class Cable:
+class Ethernet:
     def __init__(self,puerto1,puerto2):
         self.puerto1 = puerto1
         self.puerto2 = puerto2
-        puerto1.cable = self
-        puerto2.cable = self
+        puerto1.ethernet = self
+        puerto2.ethernet = self
     
     def enviar_informacion(self,dato,puerto_enviando):
         if puerto_enviando == self.puerto1:
@@ -19,27 +18,25 @@ class Cable:
             self.puerto1.recibir_dato(dato)
 
     def desconectar(self):
-        self.puerto1.cable = None
-        self.puerto2.cable = None
-
+        self.puerto1.ethernet = None
+        self.puerto2.ethernet = None
 
 class Puerto:
     def __init__(self,dispositivo):
         self.dispositivo = dispositivo
-        self.cable = None
+        self.ethernet = None
     
     def conectar(self,puerto):
-        Cable(self,puerto)
+        Ethernet(self,puerto)
     
     def recibir_dato(self, dato):
         self.dispositivo.get_transmision_dato(dato,self)
 
     def enviar_dato(self, dato):
-        self.cable.enviar_dato(dato,self)
+        self.ethernet.enviar_dato(dato,self)
     
     def desconectado(self):
-        return self.cable == None
-
+        return self.ethernet == None
 
 class PC:
     def __init__(self,nombre):
@@ -69,7 +66,7 @@ class PC:
         Exception("El dispositivo a conectarse no tiene puertos disponibles")        
 
     def desconectar(self):
-        self.puerto.cable.desconectar(self.puerto)
+        self.puerto.ethernet.desconectar(self.puerto)
 
     def get_transmision_dato(self, dato, puerto):
         self.buffer += str(dato)
@@ -79,7 +76,7 @@ class PC:
         self.puertos[0].enviar_dato(dato)
 
     def desconectar(self):
-        self.puertos.cable.desconectar()
+        self.puertos.ethernet.desconectar()
     
     def reset_buffer(self):
         self.buffer = ''
@@ -190,5 +187,3 @@ class Switch:
         for puerto in self.puertos:
             if puerto != puerto_negado and puerto.desconectado == False:
                 puerto.enviar_dato(dato)
-
-
