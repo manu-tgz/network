@@ -1,4 +1,5 @@
 from app.tools.null import null_list
+from app.tools.collections import get_diferent_by_key_in_dict,get_diferents_by_index_in_list
 
 class Log:
     all_data = [] 
@@ -38,11 +39,10 @@ class Ethernet:
 
     def disconnect(self, device_name):
         self.devices.pop(device_name)
-
+    
     def transfer(self, sender, data, devices,global_time,signal_time):
         if len(self.devices) != 2: return data 
-        sender_device = self.devices[sender][0]
-        reciever_device, reciever_port = [ self.devices[t] for t in self.devices if t != sender ][0]
+        reciever_device, reciever_port = get_diferent_by_key_in_dict(self.devices,sender)[0]
 
         return reciever_device.recieve(data, reciever_port,devices,global_time,signal_time) 
 
@@ -61,16 +61,13 @@ class PC(Device):
         if port != 0: raise Exception("Los host solo tienen 1 puerto.")
         super().disconnect(port)
         
-    def send(self, data_to_send,global_time,signal_time):
+    def send(self, data_to_send, global_time, signal_time):
         if self.ports[0] == None:
-            #raise Exception("NO HAY CABLE CONECTADO A "+self.name) # AQUI!!!!!!!!!!!!!!!!!!
-            self.log(global_time,self.name+"_1", "send", data_to_send, "ok")
-            return
-        
+            raise Exception("Don't have "+self.name) # AQUI!!!!!!!!!!!!!!!!!!
+                
         self.last_transmision_time = global_time 
         self.current_transmision = data_to_send 
         devices = []
-
         data_scanned =self.ports[0].transfer(self.name,data_to_send, devices,global_time,signal_time)
 
         for d,p in devices:
@@ -80,7 +77,6 @@ class PC(Device):
         self.log(global_time,self.name+"_1", "send", data_to_send, "ok" if data_scanned == data_to_send else "collision")
    
     def recieve(self, data, port, devices,global_time,signal_time):
-
         devices.append((self,1))
 
         if self.current_transmision == None or global_time - self.last_transmision_time > signal_time :
@@ -117,17 +113,16 @@ class Hub(Device):
                 self.log(global_time,self.name+"_"+str(i),"send",data, "")
 
     def recieve(self, data, enter_port, devices,global_time,signal_time):
-
         devices.append((self,enter_port))
-
+        send_ports = get_diferents_by_index_in_list(self.ports,enter_port)
+        return self.send( data, send_ports, devices, global_time,signal_time)
+    
+    def send(self, data, ports, devices, global_time, signal_time):
         data_scanned = None
         diferent_data = False
-        for port,i in zip(self.ports,range(len(self.ports))): 
-            if port == None or i == enter_port: continue
-            
-            temp =  port.transfer(self.name, data, devices,global_time,signal_time)
+        for port in ports:
+            temp =  port.transfer(self.name, data, devices, global_time, signal_time)
             if temp != data : 
                 diferent_data = True
                 data_scanned = temp
-
         return data if not diferent_data else data_scanned

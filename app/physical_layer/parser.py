@@ -13,6 +13,13 @@ class Intruction:
         self.args = args
     
 class PhysicalParser:
+    def __init__(self):
+        self.parsers = {"create": CreateParser(),
+                        "connect":ConnectParser,
+                        "send":SendParser,
+                        "disconnect":DisconnectParser
+        }
+    
     def get_commands_from_txt(self,file_name):
         lines = get_line_txt(file_name)
         return self.parser(lines) 
@@ -36,37 +43,35 @@ class PhysicalParser:
     
     def intrucciones(self,words):
         intruccion = Intruction(int(words[0]), words[1], words[2:])
-        
-        if intruccion.function == "create":
-            return CreateParser.execute(intruccion)
-        elif intruccion.function == "connect":
-            return ConnectParser.execute(intruccion)
-        elif intruccion.function == "send":
-            return SendParser.execute(intruccion )
-        elif intruccion.function == "disconnect":
-            return DisconnectParser(intruccion )
-        # else:
-        #     raise Exception("Comando no encontrado pruebe  'create', 'connect', 'send', 'disconnect'.")
 
+        for key in self.parsers:
+            if intruccion.function == key:
+                return self.parsers[key].execute(intruccion)
+        
 class CreateParser():
-    def execute(intruccion):
-        device = intruccion.args.pop(0)
-
-        if device == "hub":
-            values= CreateParser.hub_parser(intruccion) 
-        elif device == "host":
-            values= CreateParser.host_parser(intruccion) 
-        else:
-            raise Exception("Dispositivo no encontrado pruebe 'hub','host'.") 
+    def __init__(self):
+        self.device_parser = {"hub": CreateParser.hub,
+                              "host": CreateParser.host 
+        }
         
-        return (values[0],CreateDevice(*values)) 
+    def execute(self, intruccion):
+        device = intruccion.args.pop(0)
+        values = None
+        for key in self.device_parser:
+            if device == key:
+                values = self.device_parser[key](intruccion)
+                break
+        if not values is None:        
+            return (values[0],CreateDevice(*values)) 
+        else:
+            raise Exception("Dispositivo no encontrado") 
        
-    def hub_parser(intruccion):
+    def hub(intruccion):
         return [intruccion.time, Hub, [intruccion.args[0], intruccion.args[1]]]  
     
-    def host_parser(intruccion):
-        return [intruccion.time, PC, [intruccion.args[0]]]        
-
+    def host(intruccion):
+        return [intruccion.time, PC, [intruccion.args[0]]]
+     
 class ConnectParser():
     def execute(intruccion):
         dev1, port1=intruccion.args.pop(0).split("_")
@@ -83,5 +88,3 @@ class DisconnectParser:
     def execute(intruccion):
         dev1, port1=intruccion.args.pop(0).split("_")
         return (intruccion.time, Disconnect(intruccion.time,dev1, int(port1)-1))
-    
-

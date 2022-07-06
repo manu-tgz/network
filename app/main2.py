@@ -9,7 +9,7 @@ def main():
     #      raise Exception("Se esperaba la direccion de las instrucciones.")
 
     # Get commands from txt
-    file_name = "network/test.txt" #argv[1]
+    file_name = "app/atest.txt" #argv[1]
     parser = LinkParser()
     commands = parser.get_commands_from_txt(file_name)
     

@@ -45,8 +45,11 @@ class SendData(Process):
         super().__init__(time)
         self.host = host
         self.data= data
-        
+        self.index = 0
+
     def execute(self, network):
+        # Crear evento de enviar cuando se ejecute 1 no todos a la vez 
+        
         if not network.devices.__contains__(self.host):
             raise Exception("No existe el dispositivo.")
         time = self.time
@@ -57,6 +60,7 @@ class SendData(Process):
         return send_events
             
 class Send(SendData):
+    # Make async/await
     def execute(self, network):
         network.devices[self.host].send(self.data,self.time,network.signal_time)
         
