@@ -1,12 +1,6 @@
 from app.physical_layer.devices import Ethernet
+from app.interface_layer.process_interface import Process
 
-class Process:
-    def __init__(self, time ):
-        self.time = time
-    def execute(self, network):
-        pass
-    def __lt__(self, other):
-        return True
 
 class CreateDevice(Process):
     def __init__(self, time, device, args ):

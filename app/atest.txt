@@ -1,11 +1,16 @@
 25 create host c1
 25 create host c2
 25 create host c3
-25 create hub h1 4
+25 create switch s1 4
+25 create switch s2 5
 
-30 connect c1_1 h1_2
-30 connect c2_1 h1_3
-30 connect c3_1 h1_1
+30 mac c1 A4B5
+30 mac c2 B9F2
 
-40 send c1 101
-51 send c2 1
+35 connect c1_1 s1_1
+35 connect s1_2 s2_1
+35 connect s2_2 c2_1
+
+45 send_frame c2 A4B5 12AABAA
+1000 send_frame c1 B9F2 123456789ABCDEF 
+4000 send_frame c2 A4B5 92F32A 

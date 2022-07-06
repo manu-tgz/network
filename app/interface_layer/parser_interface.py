@@ -32,7 +32,7 @@ class Parser:
 
     def get_intructions(self,words):
         result = self.intrucciones(words)
-        if result is None:
+        if result is None and not self.parser_class is None:
             return self.parser_class().get_intructions(words)
         return result
     

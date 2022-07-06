@@ -2,13 +2,18 @@ from app.physical_layer.parser import PhysicalParser, CreateParser
 from app.tools.file import  save
 from .devices import *
 from app.interface_layer.parser_interface import Parser
+from .process import SetMAC, SendFrame
 
 
 class LinkParser(Parser):
     def __init__(self):
         super().__init__()
-        self.parsers["mac"]= MacParser
-        self.parsers["send_frame"]= FrameParser 
+        self.parsers = {"create": CreateParserLink(),
+                        "mac":MacParser,
+                        "send_frame":FrameParser
+        }
+        self.parser_class = PhysicalParser
+        
 
     def save_data(file_name, devices):
         print("Saving data...") 
@@ -16,21 +21,17 @@ class LinkParser(Parser):
             save(d+".txt","output/solution_"+file_name,devices[d].log.data)
             save(d+"_data.txt","output/solution_"+file_name,devices[d].log.link_data)
     
-        save("all.txt","output/solution_"+file_name,Link_log.all_data)
-        save("data_all.txt","output/solution_"+file_name,Link_log.all_link_data)
+        save("all.txt","output/solution_"+file_name, Link_log.all_data)
+        save("data_all.txt","output/solution_"+file_name, Link_log.all_link_data)
         print("OK")        
         
 class MacParser:
-    def __init__(self):
-        pass
     def execute(intruccion):
-        pass  
+        return (intruccion.time, SetMAC(intruccion.time, *intruccion.args))
 
 class FrameParser:
-    def __init__(self):
-        pass
     def execute(intruccion):
-        pass
+        return (intruccion.time, SendFrame(intruccion.time, *intruccion.args))
     
 class CreateParserLink(CreateParser):
     def __init__(self):
@@ -44,4 +45,4 @@ class CreateParserLink(CreateParser):
         return [intruccion.time, PCMac, [intruccion.args[0]]]
     
     def switch(intruccion):
-        return 
+        return [intruccion.time, Switch, [intruccion.args[0], intruccion.args[1]]]  

@@ -37,13 +37,15 @@ class Switch(LinkHub):
         pass
         
 class Frame:
-    def __init__(self,host, MAC, data):
-        self.host = host
-        self.MAC = MAC
+    def __init__(self, frame, destination_Mac, source_Mac, size, extra_field, data ):
+        self.destination_Mac = destination_Mac
+        self.source_Mac = source_Mac
+        self.size = size
+        self.extra_field = extra_field
         self.data = data
-        self.frame = self.generate_frame()
+        self.frame = frame
         
-    def generate_frame(self):
-        return 
-        
+def generate_frame(self, data):
+    return 
+
         
