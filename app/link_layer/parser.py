@@ -1,8 +1,10 @@
 from app.physical_layer.parser import PhysicalParser, CreateParser
 from app.tools.file import  save
 from .devices import *
+from app.interface_layer.parser_interface import Parser
 
-class LinkParser(PhysicalParser):
+
+class LinkParser(Parser):
     def __init__(self):
         super().__init__()
         self.parsers["mac"]= MacParser
@@ -16,7 +18,7 @@ class LinkParser(PhysicalParser):
     
         save("all.txt","output/solution_"+file_name,Link_log.all_data)
         save("data_all.txt","output/solution_"+file_name,Link_log.all_link_data)
-        print("OK")
+        print("OK")        
         
 class MacParser:
     def __init__(self):

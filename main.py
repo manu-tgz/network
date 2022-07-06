@@ -1,2 +1,2 @@
-from app.main2 import main
+from app.main1 import main
 main()

@@ -1,38 +1,17 @@
 from .devices import Hub, PC
 from .process import CreateDevice, ConnectDevices,SendData,Disconnect
 from .devices import Log
+from app.interface_layer.parser_interface import Parser
 from app.tools.file import  save, get_line_txt
 
-class Intruction:
-    """25 create host c1
-      time: 25 , function:create, args: [host, c1]
-    """
-    def __init__(self, time:int, function, args): 
-        self.time=time
-        self.function = function
-        self.args = args
-    
-class PhysicalParser:
+
+class PhysicalParser(Parser):
     def __init__(self):
         self.parsers = {"create": CreateParser(),
                         "connect":ConnectParser,
                         "send":SendParser,
                         "disconnect":DisconnectParser
         }
-    
-    def get_commands_from_txt(self,file_name):
-        lines = get_line_txt(file_name)
-        return self.parser(lines) 
-        
-    def parser(self,lines):
-        """Parsear las lines
-        Args:
-            lines (list): line from txt file
-        """
-        result=[]
-        for line in lines:
-            result.append(self.intrucciones(line.split(" ")))                  
-        return result
     
     def save_data(self,file_name, devices):
         print("Saving data...") 
@@ -41,13 +20,6 @@ class PhysicalParser:
         save("all.txt","output/solution_"+file_name,Log.all_data)
         print("Done!")
     
-    def intrucciones(self,words):
-        intruccion = Intruction(int(words[0]), words[1], words[2:])
-
-        for key in self.parsers:
-            if intruccion.function == key:
-                return self.parsers[key].execute(intruccion)
-        
 class CreateParser():
     def __init__(self):
         self.device_parser = {"hub": CreateParser.hub,

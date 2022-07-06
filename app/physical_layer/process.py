@@ -48,8 +48,7 @@ class SendData(Process):
         self.index = 0
 
     def execute(self, network):
-        # Crear evento de enviar cuando se ejecute 1 no todos a la vez 
-        
+        # FIXME: Crear evento de enviar cuando se ejecute 1 no todos a la vez
         if not network.devices.__contains__(self.host):
             raise Exception("No existe el dispositivo.")
         time = self.time
