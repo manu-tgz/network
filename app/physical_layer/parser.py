@@ -1,11 +1,11 @@
 from .devices import Hub, PC
 from .process import CreateDevice, ConnectDevices,SendData,Disconnect
 from .devices import Log
-from app.interface_layer.parser_interface import Parser
+from app.interface_layer.parser_interface import ABCParser
 from app.tools.file import  save, get_line_txt
 
 
-class PhysicalParser(Parser):
+class PhysicalParser(ABCParser):
     def __init__(self):
         self.parsers = {"create": CreateParser(),
                         "connect":ConnectParser,

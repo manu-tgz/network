@@ -1,7 +1,6 @@
 from app.physical_layer.devices import Ethernet
 from app.interface_layer.process_interface import Process
 
-
 class CreateDevice(Process):
     def __init__(self, time, device, args ):
         super().__init__(time)
@@ -35,27 +34,32 @@ class ConnectDevices(Process):
         d2.connect(ethernet,self.port2)
 
 class SendData(Process):
-    def __init__(self, time, host, data ):
+    def __init__(self, time, host, data, index=0,collision=False ):
         super().__init__(time)
         self.host = host
         self.data= data
-        self.index = 0
+        self.index = index
+        self.collision = collision
 
-    def execute(self, network):
-        # FIXME: Crear evento de enviar cuando se ejecute 1 no todos a la vez
-        if not network.devices.__contains__(self.host):
-            raise Exception("No existe el dispositivo.")
-        time = self.time
-        send_events = []
-        for byte in self.data:
-            send_events.append((time, Send(time, self.host,int(byte))))
-            time+=network.signal_time
-        return send_events
-            
-class Send(SendData):
     # Make async/await
     def execute(self, network):
-        network.devices[self.host].send(self.data,self.time,network.signal_time)
+        """Envia un bit y si todo ok crea otro evento para que se envie lo que falte
+        si hubo collision lo reenvia en 10 o 20 segundos"""
+        if not network.devices.__contains__(self.host):
+            raise Exception("Dont't exist {} dispositive".format(self.host))
+        result = network.devices[self.host].send(self.data[self.index],self.time,network.signal_time)
+        time = self.time+ network.signal_time
+        
+        print("send time:{} host:{} data:{} result:{}".format(self.time, self.host,self.data[self.index],result))
+        return self.create_event(time, result)
+        
+    def create_event(self,time, result):
+        """crea otro evento para que se envie el proximo bit o reenviar el de collision"""
+        if result == "ok" and self.index+1 < len(self.data):
+            return [(time, SendData(time, self.host,self.data,self.index+1))]
+        elif result == "collision":
+            if self.collision is True: time+=10
+            return [(time, SendData(time, self.host,self.data, self.index, True ))]         
         
 class Disconnect(Process):
     def __init__(self, time, host, port):

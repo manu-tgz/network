@@ -9,7 +9,7 @@ class Intruction:
         self.function = function
         self.args = args
     
-class Parser:
+class ABCParser:
     parsers = {}
     parser_class = None
     
@@ -42,3 +42,4 @@ class Parser:
         for key in self.parsers:
             if intruccion.function == key:
                 return self.parsers[key].execute(intruccion)
+            

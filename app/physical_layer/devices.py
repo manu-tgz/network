@@ -41,10 +41,11 @@ class Ethernet:
         self.devices.pop(device_name)
     
     def transfer(self, sender, data, devices,global_time,signal_time):
+        """obtiene el dispositivo que va a recibir y le pasa la informacion"""
         if len(self.devices) != 2: return data 
-        reciever_device, reciever_port = get_diferent_by_key_in_dict(self.devices,sender)[0]
+        out_device, out_port = get_diferent_by_key_in_dict(self.devices,sender)[0]
 
-        return reciever_device.recieve(data, reciever_port,devices,global_time,signal_time) 
+        return out_device.recieve(data, out_port,devices,global_time,signal_time) 
 
 class PC(Device):
     def __init__(self,name):
@@ -73,8 +74,9 @@ class PC(Device):
         for d,p in devices:
             #d.log(global_time,d.name+"_"+str(p),"recieve",data_scanned,"")
             d.log_data(data_scanned,p,global_time)
-            
-        self.log(global_time,self.name+"_1", "send", data_to_send, "ok" if data_scanned == data_to_send else "collision")
+        result = "ok" if data_scanned == data_to_send else "collision"  
+        self.log(global_time,self.name+"_1", "send", data_to_send,result )
+        return result
    
     def recieve(self, data, port, devices,global_time,signal_time):
         devices.append((self,1))
@@ -113,11 +115,13 @@ class Hub(Device):
                 self.log(global_time,self.name+"_"+str(i),"send",data, "")
 
     def recieve(self, data, enter_port, devices,global_time,signal_time):
+        """Me llego algo busco quienes reciben y se los envio"""
         devices.append((self,enter_port))
         send_ports = get_diferents_by_index_in_list(self.ports,enter_port)
         return self.send( data, send_ports, devices, global_time,signal_time)
     
     def send(self, data, ports, devices, global_time, signal_time):
+        """le envio el bit a los dispositivos"""
         data_scanned = None
         diferent_data = False
         for port in ports:

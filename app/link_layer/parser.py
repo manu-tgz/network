@@ -1,11 +1,11 @@
 from app.physical_layer.parser import PhysicalParser, CreateParser
 from app.tools.file import  save
 from .devices import *
-from app.interface_layer.parser_interface import Parser
+from app.interface_layer.parser_interface import ABCParser
 from .process import SetMAC, SendFrame
 
 
-class LinkParser(Parser):
+class LinkParser(ABCParser):
     def __init__(self):
         super().__init__()
         self.parsers = {"create": CreateParserLink(),
