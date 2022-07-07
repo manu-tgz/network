@@ -14,11 +14,10 @@ class PhysicalParser(ABCParser):
         }
     
     def save_data(self,file_name, devices):
-        print("Saving data...") 
         for d in devices:
             save(d+".txt","output/solution_"+file_name,devices[d].log.data)
         save("all.txt","output/solution_"+file_name,Log.all_data)
-        print("Done!")
+        print("Ok!")
     
 class CreateParser():
     def __init__(self):
