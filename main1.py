@@ -1,14 +1,15 @@
+from sys import argv
 from app.physical_layer.parser import PhysicalParser
 from app.network import Network
 from app.admin import Admin
 from app.tools.file import get_file_name
 
 def main():
-    # if len(argv) < 2 :
-    #     raise Exception("Se esperaba la direccion de las instrucciones.")
+    if len(argv) < 2 :
+        raise Exception("Insert txt address")
     
     # Get commands from txt
-    file_name = "app/atest.txt" #argv[1]
+    file_name = argv[1]
     parser = PhysicalParser()
     commands = parser.get_commands_from_txt(file_name)
     
@@ -20,3 +21,5 @@ def main():
     # Save log in txts
     file_name = get_file_name(file_name)
     parser.save_data(file_name, admin.network.devices)
+
+main()
