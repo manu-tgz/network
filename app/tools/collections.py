@@ -1,4 +1,5 @@
 def get_diferents_by_index_in_list(list, diferent):
+    """Obtiene los diferentes a list[diferent] y los guarda en una lista"""
     new_list = []
     for i in range(len(list)):
         if i!= diferent and list[i]!=None:

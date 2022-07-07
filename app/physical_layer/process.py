@@ -1,4 +1,4 @@
-from app.physical_layer.devices import Ethernet
+from app.physical_layer.devices import EthernetHalfDuplex
 from app.interface_layer.process_interface import Process
 
 class CreateDevice(Process):
@@ -20,6 +20,7 @@ class ConnectDevices(Process):
         self.port1 = port1
         self.dev2 = dev2
         self.port2 = port2
+        self.ethernet = EthernetHalfDuplex
           
     def execute(self, network):
         #print(network.devices)
@@ -29,7 +30,7 @@ class ConnectDevices(Process):
         d1=network.devices[self.dev1]
         d2=network.devices[self.dev2]
 
-        ethernet = Ethernet()
+        ethernet = self.ethernet()
         d1.connect(ethernet,self.port1)
         d2.connect(ethernet,self.port2)
 
@@ -47,10 +48,11 @@ class SendData(Process):
         si hubo collision lo reenvia en 10 o 20 segundos"""
         if not network.devices.__contains__(self.host):
             raise Exception("Dont't exist {} dispositive".format(self.host))
-        result = network.devices[self.host].send(self.data[self.index],self.time,network.signal_time)
+        is_the_last = self.index == len(self.data)-1
+        result = network.devices[self.host].send(self.data[self.index],self.time,network.signal_time,is_the_last)
         time = self.time+ network.signal_time
         
-        print("send time:{} host:{} data:{} result:{}".format(self.time, self.host,self.data[self.index],result))
+        # print("send time:{} host:{} data:{} result:{}".format(self.time, self.host,self.data[self.index],result))
         return self.create_event(time, result)
         
     def create_event(self,time, result):

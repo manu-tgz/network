@@ -41,5 +41,4 @@ class ABCParser:
 
         for key in self.parsers:
             if intruccion.function == key:
-                return self.parsers[key].execute(intruccion)
-            
+                return self.parsers[key].execute(intruccion)    

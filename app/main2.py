@@ -7,7 +7,7 @@ from app.tools.file import get_file_name
 def main():
     # if len(argv) < 2 :
     #      raise Exception("Se esperaba la direccion de las instrucciones.")
-
+    
     # Get commands from txt
     file_name = "app/atest.txt" #argv[1]
     parser = LinkParser()

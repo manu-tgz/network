@@ -2,13 +2,13 @@ from .devices import Hub, PC
 from .process import CreateDevice, ConnectDevices,SendData,Disconnect
 from .devices import Log
 from app.interface_layer.parser_interface import ABCParser
-from app.tools.file import  save, get_line_txt
+from app.tools.file import  save
 
 
 class PhysicalParser(ABCParser):
     def __init__(self):
         self.parsers = {"create": CreateParser(),
-                        "connect":ConnectParser,
+                        "connect":ConnectParser(),
                         "send":SendParser,
                         "disconnect":DisconnectParser
         }
@@ -34,9 +34,7 @@ class CreateParser():
                 values = self.device_parser[key](intruccion)
                 break
         if not values is None:        
-            return (values[0],CreateDevice(*values)) 
-        else:
-            raise Exception("Dispositivo no encontrado") 
+            return (values[0],CreateDevice(*values))  
        
     def hub(intruccion):
         return [intruccion.time, Hub, [intruccion.args[0], intruccion.args[1]]]  
@@ -45,7 +43,7 @@ class CreateParser():
         return [intruccion.time, PC, [intruccion.args[0]]]
      
 class ConnectParser():
-    def execute(intruccion):
+    def execute(self,intruccion):
         dev1, port1=intruccion.args.pop(0).split("_")
         dev2, port2=intruccion.args.pop(0).split("_")
         return (intruccion.time,ConnectDevices(intruccion.time,dev1, int(port1)-1,dev2, int(port2)-1 ))

@@ -12,7 +12,7 @@ def send_frame(host, MAC, data):
     Esta funcion ejecuta la instruccion: <time> send_frame <host> <mac destino> <data> '''
     pass
     # bites = frame(host, MAC, data)
-    # time = Env.current_env.global_time
+    # time = Env.current_env.time
     # for i in range(len(bites)):
     #     Env.current_env.add_action(time,link_layer_send_event(time,host.name,bites[i], is_last_bit=False if i!=len(bites)-1 else True))  
     #     time+=Env.current_env.signal_time
