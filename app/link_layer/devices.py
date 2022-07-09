@@ -6,7 +6,7 @@ class Link_log(Log):
     all_link_data = []
     link_data = []
 
-    def log_link(self, time, frame,error):
+    def log_data(self, time, frame,error):
         string = str(time) +" "+ frame["MAC_source"] +" "+ frame["data"] +" "+ error
         self.link_data.append(string)
         self.all_link_data.append(string)
@@ -50,7 +50,7 @@ class PCMac(PC):
             if FrameSerializer.frame_error(frame['check_data'], frame['data']):
                 error = "error"
             
-            self.log.log_link(time,frame,error)   
+            self.log.log_data(time,frame,error)   
   
        
 class LinkHub(Hub):
