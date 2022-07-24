@@ -44,8 +44,13 @@ class SendData(Process):
 
     # Make async/await
     def execute(self, network):
-        """Envia un bit y si todo ok crea otro evento para que se envie lo que falte
-        si hubo collision lo reenvia en 10 o 20 segundos"""
+        """
+        Envia un bit y si todo ok crea otro evento para que se envie lo que falte
+        si hubo collision lo reenvia en tiempo determinado
+        Para enviar lo que hace es ir al host del evento y decirle envia el argumento.
+        Si tiene que enviar 0001 crea un evento para cada bit, primero el del 0 si se envio
+        crea otro para el siguiente y asi, de tal forma que hay collision y es solo reenviar.
+        """
         if not network.devices.__contains__(self.host):
             raise Exception("Dont't exist {} dispositive".format(self.host))
         is_the_last = self.index == len(self.data)-1
@@ -60,6 +65,7 @@ class SendData(Process):
         if result == "ok" and self.index+1 < len(self.data):
             return [(time, SendData(time, self.host,self.data,self.index+1))]
         elif result == "collision":
+            "Si hubo collision se decide que hacer"
             if self.collision is True: time+=10
             return [(time, SendData(time, self.host,self.data, self.index, True ))]         
         

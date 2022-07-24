@@ -21,8 +21,11 @@ class PhysicalParser(ABCParser):
     
 class CreateParser():
     def __init__(self):
-        self.device_parser = {"hub": CreateParser.hub,
-                              "host": CreateParser.host 
+        self.device_parser = {"hub": self.hub,
+                              "host": self.host 
+        }
+        self.device_class = {"hub": Hub,
+                              "host":PC 
         }
         
     def execute(self, intruccion):
@@ -35,11 +38,11 @@ class CreateParser():
         if not values is None:        
             return (values[0],CreateDevice(*values))  
        
-    def hub(intruccion):
-        return [intruccion.time, Hub, [intruccion.args[0], intruccion.args[1]]]  
+    def hub(self,intruccion):
+        return [intruccion.time, self.device_class['hub'], [intruccion.args[0], intruccion.args[1]]]  
     
-    def host(intruccion):
-        return [intruccion.time, PC, [intruccion.args[0]]]
+    def host(self, intruccion):
+        return [intruccion.time, self.device_class['host'], [intruccion.args[0]]]
      
 class ConnectParser():
     def execute(self,intruccion):

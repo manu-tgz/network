@@ -1,5 +1,5 @@
 from app.interface_layer.process_interface import Process
-from .devices import PCMac, FrameSerializer
+from .devices import LinkPC, FrameSerializer
 from app.physical_layer.process import SendData
 
 class ProcessMAC(Process):
@@ -12,7 +12,7 @@ class SetMAC(ProcessMAC):
 
     def execute(self, network):
         device = network.devices[self.host]
-        if type(device) is PCMac:
+        if type(device) is LinkPC:
             device.set_MAC(self.mac)
         else:
             Exception('This is not a PC with MAC') 

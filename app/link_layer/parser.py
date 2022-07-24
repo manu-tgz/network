@@ -19,8 +19,8 @@ class LinkParser(ABCParser):
             save(d+".txt","output/solution_"+file_name,devices[d].log.data)
             save(d+"_data.txt","output/solution_"+file_name,devices[d].log.link_data)
     
-        save("all.txt","output/solution_"+file_name, Link_log.all_data)
-        save("all_data.txt","output/solution_"+file_name, Link_log.all_link_data)
+        save("all.txt","output/solution_"+file_name, LinkLog.all_data)
+        save("all_data.txt","output/solution_"+file_name, LinkLog.all_link_data)
         print("OK")        
         
 class MacParser:
@@ -34,19 +34,15 @@ class FrameParser:
 class CreateParserLink(CreateParser):
     def __init__(self):
         super().__init__()
-        self.device_parser = {"switch":CreateParserLink.switch,
-                              "hub": CreateParserLink.hub,
-                              "host": CreateParserLink.host 
+        self.device_parser = {"switch":self.switch 
+        }
+        self.device_class = {"hub": LinkHub,
+                            "host":LinkPC,
+                            "switch":Switch 
         }
     
-    def hub(intruccion):
-        return [intruccion.time, LinkHub, [intruccion.args[0], intruccion.args[1]]]  
-    
-    def host(intruccion):
-        return [intruccion.time, PCMac, [intruccion.args[0]]]
-    
-    def switch(intruccion):
-        return [intruccion.time, Switch, [intruccion.args[0], intruccion.args[1]]]  
+    def switch(self,intruccion):
+        return [intruccion.time, self.device_class['switch'], [intruccion.args[0], intruccion.args[1]]]  
     
 class LinkConnectParser(ConnectParser):
     def execute(self,intruccion):

@@ -2,7 +2,7 @@ from app.physical_layer.devices import *
 from app.tools.null import null_lists
 from .hashs import FrameSerializer
 
-class Link_log(Log):
+class LinkLog(Log):
     all_link_data = []
     link_data = []
 
@@ -22,24 +22,24 @@ class DuplexEthernet(Ethernet):
         out_device.recieve(data, out_port,devices,time,signal_time,"ok")
         return data     
         
-class PCMac(PC):
+class LinkPC(PC):
     def __init__(self,name):
         super().__init__(name)
         self.MAC = None
-        self.log = Link_log()
+        self.log = LinkLog()
         self.last_frame = ''
     
     def set_MAC(self, MAC):
         self.MAC = MAC
-        
+
     def recieve(self, data, port, time, signal_time, status,is_the_last):
         data_scan = super().recieve(data, port, time, signal_time, status,is_the_last)
         self.last_frame += str(data_scan)
-        
+
         if is_the_last: 
             self.save_frame(time)
             self.last_frame = ""
-        
+
         return data_scan
 
     def save_frame(self, time):
@@ -49,14 +49,14 @@ class PCMac(PC):
             error = '' 
             if FrameSerializer.frame_error(frame['check_data'], frame['data']):
                 error = "error"
-            
+
             self.log.log_data(time,frame,error)   
-  
-       
+
+
 class LinkHub(Hub):
     def __init__(self, name, amount_ports):
         super().__init__(name, amount_ports)
-        self.log = Link_log()
+        self.log = LinkLog()
 
     def reset_buffer(self):
         pass      

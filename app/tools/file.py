@@ -2,7 +2,6 @@ from pathlib import Path
 from os.path import exists
 from os import mkdir
 
-
 def get_line_txt(file_name):
     with open(file_name, "r") as fd:
         lines = fd.readlines()
