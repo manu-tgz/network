@@ -14,7 +14,6 @@ class Admin:
     def simulate(self):
         while not self.queue.empty():
             t, event = self.queue.get() 
-            
             more_events = event.execute(self.network)
             if not more_events is None:
                 self.add_actions(more_events)     

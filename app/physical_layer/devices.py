@@ -1,3 +1,4 @@
+from app.interface_layer.devices_interface import Device
 from app.tools.null import null_list
 from app.tools.collections import get_diferent_by_key_in_dict,get_diferents_by_index_in_list
  
@@ -13,20 +14,10 @@ class Log:
     def __call__(self, time ,device , action ,data, status):
         self.log(time ,device , action ,data, status)
 
-class Device:
-    def __init__(self,name): 
+class PhysicalDevice(Device):
+    def __init__(self, name):
+        super().__init__(name)
         self.log = Log()
-        self.name = name
-        self.ports= None 
-        
-    def connect(self, ethernet, port):
-        """Conecta un cable a un device. En un puerto de la computadora conecta el cable"""
-        ethernet.connect(self, port)
-        self.ports[port] = ethernet
-        
-    def disconnect(self, port):
-        self.ports[port].disconnect(self.name)
-        self.ports[port] = None 
 
 class Ethernet:
     def __init__(self):
@@ -70,7 +61,7 @@ def bi(num):
     if num ==1: return 0
     else: return 1                  
 
-class PC(Device):
+class PC(PhysicalDevice):
     def __init__(self,name):
         super().__init__(name)
         self.ports = [None] 
@@ -83,14 +74,14 @@ class PC(Device):
         if port != 0: raise Exception("Los host solo tienen 1 puerto.")
         super().disconnect(port)
         
-    def send(self, data_to_send, time, signal_time, is_the_last):
+    def send(self, data, time, signal_time, is_the_last):
         if self.ports[0] == None:
             raise Exception("Don't have "+self.name) 
                 
-        data_scanned =self.ports[0].transfer(self.name,data_to_send,time,signal_time,is_the_last)
+        data_scanned =self.ports[0].transfer(self.name,data,time,signal_time,is_the_last)
         
-        result = "ok" if data_scanned == data_to_send else "collision"  
-        self.log(time,self.name+"_1", "send", data_to_send,result )
+        result = "ok" if data_scanned == data else "collision"  
+        self.log(time,self.name+"_1", "send", data,result )
         return result
    
     def recieve(self, data, port,time,signal_time, status, is_the_last):
@@ -105,7 +96,7 @@ class PC(Device):
     def log_data(self, data,_, time):
         self.log(time,self.name+"_1","receive",data, "")
 
-class Hub(Device):
+class Hub(PhysicalDevice):
     def __init__(self,name,amount_ports):
         super().__init__(name)
         self.amount_ports = int(amount_ports) 

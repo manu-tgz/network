@@ -7,10 +7,10 @@ from app.tools.file import  save
 
 class PhysicalParser(ABCParser):
     def __init__(self):
-        self.parsers = {"create": CreateParser(),
-                        "connect":ConnectParser(),
-                        "send":SendParser,
-                        "disconnect":DisconnectParser
+        self.parsers = {"send":SendParser,
+                        "disconnect":DisconnectParser,
+                        "create": CreateParser(),
+                        "connect":ConnectParser()
         }
     
     def save_data(self,file_name, devices):
@@ -28,35 +28,35 @@ class CreateParser():
                               "host":PC 
         }
         
-    def execute(self, intruccion):
-        device = intruccion.args.pop(0)
+    def execute(self, instruction):
+        device = instruction.args.pop(0)
         values = None
         for key in self.device_parser:
             if device == key:
-                values = self.device_parser[key](intruccion)
+                values = self.device_parser[key](instruction)
                 break
         if not values is None:        
             return (values[0],CreateDevice(*values))  
        
-    def hub(self,intruccion):
-        return [intruccion.time, self.device_class['hub'], [intruccion.args[0], intruccion.args[1]]]  
+    def hub(self,instruction):
+        return [instruction.time, self.device_class['hub'], [instruction.args[0], int(instruction.args[1])]]  
     
-    def host(self, intruccion):
-        return [intruccion.time, self.device_class['host'], [intruccion.args[0]]]
+    def host(self, instruction):
+        return [instruction.time, self.device_class['host'], [instruction.args[0]]]
      
 class ConnectParser():
-    def execute(self,intruccion):
-        dev1, port1=intruccion.args.pop(0).split("_")
-        dev2, port2=intruccion.args.pop(0).split("_")
-        return (intruccion.time,ConnectDevices(intruccion.time,dev1, int(port1)-1,dev2, int(port2)-1 ))
+    def execute(self,instruction):
+        dev1, port1=instruction.args.pop(0).split("_")
+        dev2, port2=instruction.args.pop(0).split("_")
+        return (instruction.time,ConnectDevices(instruction.time,dev1, int(port1)-1,dev2, int(port2)-1 ))
 
 class SendParser():
-    def execute(intruccion):
-        host = intruccion.args.pop(0)
-        data = intruccion.args.pop(0)
-        return (intruccion.time,SendData(intruccion.time,host, data))
+    def execute(instruction):
+        host = instruction.args.pop(0)
+        data = instruction.args.pop(0)
+        return (instruction.time,SendData(instruction.time,host, data))
 
 class DisconnectParser:
-    def execute(intruccion):
-        dev1, port1=intruccion.args.pop(0).split("_")
-        return (intruccion.time, Disconnect(intruccion.time,dev1, int(port1)-1))
+    def execute(instruction):
+        dev1, port1=instruction.args.pop(0).split("_")
+        return (instruction.time, Disconnect(instruction.time,dev1, int(port1)-1))

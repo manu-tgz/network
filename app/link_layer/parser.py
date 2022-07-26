@@ -7,10 +7,10 @@ from .process import SetMAC, SendFrame
 class LinkParser(ABCParser):
     def __init__(self):
         super().__init__()
-        self.parsers = {"create": CreateParserLink(),
-                        "mac":MacParser,
+        self.parsers = {"connect":LinkConnectParser(),
                         "send_frame":FrameParser,
-                        "connect":LinkConnectParser()
+                        "create": CreateParserLink(),
+                        "mac":MacParser
         }
         self.parser_class = PhysicalParser
 
@@ -24,27 +24,30 @@ class LinkParser(ABCParser):
         print("OK")        
         
 class MacParser:
-    def execute(intruccion):
-        return (intruccion.time, SetMAC(intruccion.time, *intruccion.args))
+    def execute(instruction):
+        return (instruction.time, SetMAC(instruction.time, *instruction.args))
 
 class FrameParser:
-    def execute(intruccion):
-        return (intruccion.time, SendFrame(intruccion.time, *intruccion.args))
+    def execute(instruction):
+        return (instruction.time, SendFrame(instruction.time, *instruction.args))
     
 class CreateParserLink(CreateParser):
     def __init__(self):
         super().__init__()
-        self.device_parser = {"switch":self.switch 
-        }
-        self.device_class = {"hub": LinkHub,
-                            "host":LinkPC,
-                            "switch":Switch 
-        }
+        self.device_parser.update({"switch":self.switch
+        })
+
+        self.device_class.update({"hub": LinkHub,
+                                  "host":LinkPC,
+                                  "switch":Switch
+        })
+
     
-    def switch(self,intruccion):
-        return [intruccion.time, self.device_class['switch'], [intruccion.args[0], intruccion.args[1]]]  
+    def switch(self,instruction):
+        return [instruction.time, self.device_class['switch'], [instruction.args[0], instruction.args[1]]]  
     
 class LinkConnectParser(ConnectParser):
-    def execute(self,intruccion):
-        tuple =  super().execute(intruccion)
+    def execute(self,instruction):
+        tuple =  super().execute(instruction)
         tuple[1].ethernet= DuplexEthernet
+        return tuple
