@@ -1,3 +1,5 @@
+from app.tools.ip import *
+
 class IpAddress:
     def __init__(self, string : str, format="ip"):
         if format == "ip":
@@ -5,7 +7,6 @@ class IpAddress:
         elif format == "bin": 
             self.ip_num = convert_bits_line_to_ip(string)
         else : raise Exception("Formato de ip indistinguible.")
-
 
     @property
     def get_bits(self):

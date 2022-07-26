@@ -1,9 +1,9 @@
+from app.interface_layer.devices_interface import ManyPortsDevice
 from app.link_layer.devices import LinkLog, LinkHub, LinkPC, Switch
 from app.tools.ip import convert_bits_line_to_ip
 from .address import IpAddress
 
-"""Devices de la capa NET
-"""
+"""Devices de la capa NET"""
 class NetLog(LinkLog) :
     all_net_data = []
     def __init__(self):
@@ -17,11 +17,50 @@ class NetLog(LinkLog) :
         self._log_net(f"{time} {convert_bits_line_to_ip(ip_origin_bits)} {payload} {(' ('+extra+')') if  extra !='' else '' }")
 
 class NetDevice ():
-    
     def __init__(self):
         self.log = NetLog()
-        self.interfaces = None  
-  
+        self.interfaces = None
+        self.ip_address = None
+        self.buffer = None
+        self._route_table = [] 
+    
+    def connect(self, cable, port):
+        self.interfaces[port]["cable"] = cable
+        cable.connect(self,port)
+        
+    def set_ip_and_mask(self,ip,mask, interface):
+        self.set_ip(ip,interface)
+        self.set_subnet_mask(mask,interface)
+
+    def set_ip(self, ip,interface):
+        self.interfaces[interface-1]["ip"] = ip
+
+    def set_subnet_mask(self, ip,interface=1):
+        self.interfaces[interface-1]["mask"] = ip
+
+    def refresh_interface(self, interface):
+        self.ip_address = self.interfaces[interface-1]["ip"]
+        self.MAC = self.interfaces[interface-1]["mac"]
+        self.buffer = self.interfaces[interface-1]["buffer"]
+        self.ports=[self.interfaces[interface-1]["cable"]]
+    
+    def add_route(self,destination,mask,gateway,interface):
+        # ordenar por cantidad de unos (1) en la mascara !!
+        self._route_table.append({
+            "destination": destination ,"mask" : mask , 
+            "gateway" : gateway , "interface": interface 
+        }) 
+
+    def clear_routes(self):
+        self._route_table.clear()
+
+    def delete_route(self,destination,mask,gateway,interface):
+        i = 0
+        for r in self._route_table:
+            if r["destination"] == destination and r["mask"] == mask and r["gateway"] == gateway and r["interface"]==interface:
+                self._route_table.pop(i)
+            i+=1
+
 """PC de la capa NET"""
 class NetPC( LinkPC, NetDevice):
     def __init__(self, name):
@@ -30,8 +69,14 @@ class NetPC( LinkPC, NetDevice):
         
         self.interfaces = [
             {"mac":None, "ip":None, "buffer":"", "cable": None} 
-        ]        
- 
+        ]
+        
+    def set_MAC(self, MAC, interface):
+        self.interfaces[interface-1]["mac"]= MAC
+        super().set_MAC(MAC)
+                
+    def send(self, data_to_send, time, signal_time, is_the_last):
+        return super().send(data_to_send, time, signal_time, is_the_last)
 
 class NetHub(LinkHub):
     def __init__(self, name, amount_ports):
@@ -48,12 +93,16 @@ class NetSwitch (Switch):
     def net_reset_buffer(self, interface):
         self.reset_buffer()
         
-
-# class Router(NetLayerComputer):
-#     def __init__(self, name, total_ports):
-#         NetLayerComputer.__init__(self, name) 
-#         self.interfaces = [ { "buffer":"" } for _ in range(total_ports) ]
+class Router(ManyPortsDevice, NetDevice):
+    def __init__(self, name, amount_ports):
+        ManyPortsDevice.__init__(self,name,amount_ports)
+        NetDevice.__init__(self) 
+        self.interfaces = [ { "buffer":"" } for _ in range(amount_ports) ]
     
+    def set_MAC(self, MAC, interface):
+        self.interfaces[interface-1]["mac"]= MAC
+        self.MAC = MAC
+         
 #     def net_reset_buffer(self, interface):
 #        #self.ip_addrs = self.interfaces[interface-1]["ip"]
 #        #self.MAC = self.interfaces[interface-1]["mac"]
@@ -88,13 +137,3 @@ class NetSwitch (Switch):
 #         self.refresh_interface(interface)
 #         LinkLayerComputer.reset_buffer(self)
 #         self.clean_buffer(interface)  
-
-#     def recieve_data(self, data, enter_port, devices):
-
-#         devices.append((self,enter_port+1))
-
-#         if self.current_transmision == None or Env.current_env.global_time - self.last_transmision_time > Env.current_env.signal_time :
-#             return data
-
-#         return int(data) ^ int(self.current_transmision)
-
